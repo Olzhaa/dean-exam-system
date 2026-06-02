@@ -20,11 +20,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Деканат: Емтихан және прокторинг жүйесі", version="1.0.0", lifespan=lifespan)
 
+import os
+_origins = os.getenv("CORS_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_origins,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=False,
 )
 
 app.include_router(auth.router)
