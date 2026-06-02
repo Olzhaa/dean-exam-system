@@ -47,6 +47,18 @@ def create_exam(payload: schemas.ExamCreate, db: Session = Depends(get_db), _use
     return _to_out(exam)
 
 
+@router.patch("/{exam_id}", response_model=schemas.ExamOut)
+def update_exam(exam_id: int, payload: schemas.ExamUpdate, db: Session = Depends(get_db), _user=Depends(require_admin)):
+    exam = db.query(models.Exam).get(exam_id)
+    if not exam:
+        raise HTTPException(404, "Емтихан табылмады")
+    for k, v in payload.model_dump(exclude_unset=True).items():
+        setattr(exam, k, v)
+    db.commit()
+    db.refresh(exam)
+    return _to_out(exam)
+
+
 @router.delete("/{exam_id}")
 def delete_exam(exam_id: int, db: Session = Depends(get_db), _user=Depends(require_admin)):
     exam = db.query(models.Exam).get(exam_id)

@@ -33,6 +33,18 @@ export default function Exams() {
     await api.deleteExam(id); load()
   }
 
+  async function updateRequiredProctors(id, value) {
+    const n = Math.max(0, parseInt(value, 10) || 0)
+    // optimistic update
+    setList((cur) => cur.map((e) => (e.id === id ? { ...e, required_proctors: n } : e)))
+    try {
+      await api.updateExam(id, { required_proctors: n })
+    } catch (ex) {
+      setErr(ex.message)
+      load()  // revert
+    }
+  }
+
   async function onImportBS(e) {
     const f = e.target.files?.[0]
     if (!f) return
@@ -143,7 +155,17 @@ export default function Exams() {
                   : <span style={{ color: '#9ca3af' }}>—</span>}
               </td>
               <td>{e.student_count || '—'}</td>
-              <td>{e.required_proctors}</td>
+              <td style={{ width: 90 }}>
+                <input
+                  type="number"
+                  min="0"
+                  max="20"
+                  value={e.required_proctors}
+                  onChange={(ev) => updateRequiredProctors(e.id, ev.target.value)}
+                  style={{ width: 64, padding: '4px 8px', textAlign: 'center' }}
+                  title="Әр кабинетке проктор саны"
+                />
+              </td>
               <td><button className="danger" onClick={() => remove(e.id)} title="Жою"><Icon name="trash" size={14} /></button></td>
             </tr>
           ))}

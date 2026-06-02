@@ -78,6 +78,7 @@ export const api = {
   // exams
   listExams: () => request('/exams'),
   createExam: (data) => request('/exams', { method: 'POST', body: JSON.stringify(data) }),
+  updateExam: (id, data) => request(`/exams/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteExam: (id) => request(`/exams/${id}`, { method: 'DELETE' }),
   importExamsBS: async (file) => {
     const fd = new FormData()

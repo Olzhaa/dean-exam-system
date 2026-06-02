@@ -70,6 +70,22 @@ class ExamCreate(ExamBase):
     pass
 
 
+class ExamUpdate(BaseModel):
+    course_code: Optional[str] = None
+    course_name: Optional[str] = None
+    program_name: Optional[str] = None
+    lecturer: Optional[str] = None
+    course_year: Optional[str] = None
+    ects: Optional[int] = None
+    student_count: Optional[int] = None
+    exam_format: Optional[str] = None
+    duration: Optional[int] = None
+    room_number: Optional[str] = None
+    required_proctors: Optional[int] = None
+    exam_date: Optional[date] = None
+    exam_time: Optional[time] = None
+
+
 class ExamOut(ExamBase):
     id: int
     rooms_list: List[str] = []
