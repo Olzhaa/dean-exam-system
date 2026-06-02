@@ -9,6 +9,7 @@ from .. import models, schemas
 from ..database import get_db
 from ..auth import require_admin, get_current_user
 from ..algorithms.fx_scheduler import generate_schedule
+from ..fx_format import import_fx_excel, export_fx_excel
 
 router = APIRouter(prefix="/fx", tags=["fx"])
 
@@ -162,6 +163,28 @@ def student_schedule(student_code: str, db: Session = Depends(get_db)):
         )
     items.sort(key=lambda x: (x.exam_date, x.exam_time))
     return schemas.FxStudentSchedule(student_code=student.student_code, student_name=student.name, items=items)
+
+
+@router.post("/requests/import-fx", response_model=schemas.EmployeeImportResult)
+async def import_fx_raw(file: UploadFile = File(...), db: Session = Depends(get_db), _user=Depends(require_admin)):
+    """Import raw SDU FX registration sheet (columns: COURSE_CODE, INSTRUCTOR, SECTION, STUD_ID, STUD_FULL_NAME, ...)"""
+    content = await file.read()
+    try:
+        added, skipped, errors = import_fx_excel(db, content)
+    except Exception as e:
+        raise HTTPException(400, f"Файлды оқу қатесі: {e}")
+    return schemas.EmployeeImportResult(added=added, skipped=skipped, errors=errors)
+
+
+@router.get("/schedule/export-bs")
+def export_schedule_bs(db: Session = Depends(get_db), _user=Depends(require_admin)):
+    """Export 2-sheet BS-style FX schedule (FX кестесі + Өтініш берген білімгерлер тізім)."""
+    data = export_fx_excel(db)
+    return StreamingResponse(
+        io.BytesIO(data),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=fx_schedule_bs.xlsx"},
+    )
 
 
 @router.get("/schedule/export")

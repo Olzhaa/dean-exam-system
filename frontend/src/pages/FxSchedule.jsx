@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api } from '../api.js'
+import { api, getToken } from '../api.js'
 
 export default function FxSchedule() {
   const [form, setForm] = useState({ start_date: '', end_date: '', time_slots: '09:00, 11:30, 14:30', default_duration: 90 })
@@ -8,6 +8,19 @@ export default function FxSchedule() {
   const [err, setErr] = useState('')
 
   async function load() { try { setList(await api.listSchedule()) } catch (e) { setErr(e.message) } }
+
+  async function downloadWithAuth(url, filename) {
+    const token = getToken()
+    try {
+      const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} })
+      if (!res.ok) throw new Error('Жүктеу қатесі')
+      const blob = await res.blob()
+      const u = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = u; a.download = filename; a.click()
+      URL.revokeObjectURL(u)
+    } catch (e) { setErr(e.message) }
+  }
   useEffect(() => { load() }, [])
 
   async function generate(e) {
@@ -59,9 +72,14 @@ export default function FxSchedule() {
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <h3 style={{ margin: 0 }}>Дайын кесте ({list.length})</h3>
           {list.length > 0 && (
-            <a href={api.exportScheduleUrl()} target="_blank" rel="noreferrer">
-              <button className="primary">📥 Excel жүктеу</button>
-            </a>
+            <div className="row" style={{ flex: '0 0 auto', gap: 8 }}>
+              <button onClick={() => downloadWithAuth(api.exportScheduleBSUrl(), 'fx_schedule_bs.xlsx')} className="primary">
+                📤 BS форматта (2 парақ)
+              </button>
+              <button onClick={() => downloadWithAuth(api.exportScheduleUrl(), 'fx_schedule.xlsx')}>
+                📥 Қарапайым Excel
+              </button>
+            </div>
           )}
         </div>
       </div>

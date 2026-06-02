@@ -85,17 +85,30 @@ class FxRequest(Base):
     id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
     course_code = Column(String, nullable=False)
+    course_title = Column(String, nullable=True, default="")
+    instructor = Column(String, nullable=True, default="")
+    section = Column(String, nullable=True, default="")
+    faculty = Column(String, nullable=True, default="")
+    cipher = Column(String, nullable=True, default="")
+    speciality = Column(String, nullable=True, default="")
+    ects = Column(Integer, nullable=True)
+    course_year = Column(String, nullable=True, default="")
 
     student = relationship("Student", back_populates="fx_requests")
 
-    __table_args__ = (UniqueConstraint("student_id", "course_code", name="uq_student_course"),)
-
 
 class FxExam(Base):
-    """A scheduled FX exam slot for a single course."""
+    """A scheduled FX exam slot for a single (course, instructor, section) session."""
     __tablename__ = "fx_exams"
     id = Column(Integer, primary_key=True, index=True)
     course_code = Column(String, nullable=False)
+    course_name = Column(String, nullable=True, default="")
+    instructor = Column(String, nullable=True, default="")
+    section = Column(String, nullable=True, default="")
+    program_name = Column(String, nullable=True, default="")
+    course_year = Column(String, nullable=True, default="")
+    ects = Column(Integer, nullable=True)
+    exam_format = Column(String, nullable=True, default="")
     duration = Column(Integer, nullable=False, default=90)  # minutes
     exam_date = Column(Date, nullable=False)
     exam_time = Column(Time, nullable=False)

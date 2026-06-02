@@ -47,6 +47,22 @@ def _add_missing_columns():
         if "room" not in cols:
             stmts.append("ALTER TABLE proctor_assignments ADD COLUMN room VARCHAR DEFAULT ''")
 
+    if inspector.has_table("fx_requests"):
+        cols = {c["name"] for c in inspector.get_columns("fx_requests")}
+        for name in ["course_title", "instructor", "section", "faculty", "cipher", "speciality", "course_year"]:
+            if name not in cols:
+                stmts.append(f"ALTER TABLE fx_requests ADD COLUMN {name} VARCHAR DEFAULT ''")
+        if "ects" not in cols:
+            stmts.append("ALTER TABLE fx_requests ADD COLUMN ects INTEGER")
+
+    if inspector.has_table("fx_exams"):
+        cols = {c["name"] for c in inspector.get_columns("fx_exams")}
+        for name in ["course_name", "instructor", "section", "program_name", "course_year", "exam_format"]:
+            if name not in cols:
+                stmts.append(f"ALTER TABLE fx_exams ADD COLUMN {name} VARCHAR DEFAULT ''")
+        if "ects" not in cols:
+            stmts.append("ALTER TABLE fx_exams ADD COLUMN ects INTEGER")
+
     if stmts:
         with engine.begin() as conn:
             for s in stmts:

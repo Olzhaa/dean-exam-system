@@ -127,8 +127,24 @@ export const api = {
     }
     return res.json()
   },
+  importFxRaw: async (file) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    const token = getToken()
+    const res = await fetch(BASE + '/fx/requests/import-fx', {
+      method: 'POST',
+      body: fd,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}))
+      throw new Error(j.detail || 'FX импорт қатесі')
+    }
+    return res.json()
+  },
   generateSchedule: (data) => request('/fx/generate', { method: 'POST', body: JSON.stringify(data) }),
   listSchedule: () => request('/fx/schedule'),
   studentSchedule: (code) => request(`/fx/schedule/student?student_code=${encodeURIComponent(code)}`),
   exportScheduleUrl: () => BASE + '/fx/schedule/export',
+  exportScheduleBSUrl: () => BASE + '/fx/schedule/export-bs',
 }
