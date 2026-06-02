@@ -71,6 +71,11 @@ def _add_missing_columns():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    backend = engine.url.get_backend_name()
+    host = engine.url.host or "local"
+    print(f"[startup] DB backend: {backend}, host: {host}")
+    if backend == "sqlite":
+        print("[startup] ⚠️  Using SQLite — data will be lost on redeploy! Set DATABASE_URL env var.")
     Base.metadata.create_all(bind=engine)
     _add_missing_columns()
     db = SessionLocal()
@@ -104,3 +109,14 @@ app.include_router(fx.router)
 @app.get("/")
 def root():
     return {"app": "Деканат жүйесі", "docs": "/docs"}
+
+
+@app.get("/health")
+def health():
+    backend = engine.url.get_backend_name()
+    return {
+        "ok": True,
+        "db_backend": backend,
+        "persistent": backend != "sqlite",
+        "warning": "SQLite ephemeral — data resets on redeploy" if backend == "sqlite" else None,
+    }
