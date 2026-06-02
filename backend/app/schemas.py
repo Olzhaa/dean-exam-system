@@ -52,6 +52,13 @@ class EmployeeImportResult(BaseModel):
 # ===== Exams =====
 class ExamBase(BaseModel):
     course_code: str
+    course_name: Optional[str] = ""
+    program_name: Optional[str] = ""
+    lecturer: Optional[str] = ""
+    course_year: Optional[str] = ""
+    ects: Optional[int] = None
+    student_count: Optional[int] = 0
+    exam_format: Optional[str] = ""
     duration: int
     room_number: str
     required_proctors: int = 1
@@ -65,7 +72,14 @@ class ExamCreate(ExamBase):
 
 class ExamOut(ExamBase):
     id: int
+    rooms_list: List[str] = []
     model_config = ConfigDict(from_attributes=True)
+
+
+class ExamImportResult(BaseModel):
+    added: int
+    skipped: int
+    errors: List[str] = []
 
 
 # ===== Proctor Assignment =====
@@ -74,6 +88,7 @@ class ProctorAssignmentOut(BaseModel):
     exam_id: int
     employee_id: int
     employee_name: Optional[str] = None
+    room: Optional[str] = ""
     model_config = ConfigDict(from_attributes=True)
 
 

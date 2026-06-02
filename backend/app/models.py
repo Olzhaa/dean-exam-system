@@ -28,13 +28,29 @@ class Exam(Base):
     __tablename__ = "exams"
     id = Column(Integer, primary_key=True, index=True)
     course_code = Column(String, nullable=False)
+    course_name = Column(String, nullable=True, default="")
+    program_name = Column(String, nullable=True, default="")
+    lecturer = Column(String, nullable=True, default="")
+    course_year = Column(String, nullable=True, default="")  # "1 курс", "2 курс"
+    ects = Column(Integer, nullable=True)
+    student_count = Column(Integer, nullable=True, default=0)
+    exam_format = Column(String, nullable=True, default="")  # "Жазбаша", "Жоба"
     duration = Column(Integer, nullable=False)  # minutes
-    room_number = Column(String, nullable=False)
-    required_proctors = Column(Integer, nullable=False, default=1)
+    room_number = Column(String, nullable=False, default="")  # comma-separated rooms
+    required_proctors = Column(Integer, nullable=False, default=1)  # proctors per room
     exam_date = Column(Date, nullable=False)
     exam_time = Column(Time, nullable=False)
 
     assignments = relationship("ProctorAssignment", back_populates="exam", cascade="all, delete-orphan")
+
+    @property
+    def rooms_list(self) -> list[str]:
+        if not self.room_number:
+            return []
+        # split by comma OR multiple spaces
+        import re
+        parts = re.split(r"[,;]\s*|\s{2,}|\n", self.room_number)
+        return [p.strip() for p in parts if p.strip()]
 
 
 class ProctorAssignment(Base):
@@ -42,11 +58,10 @@ class ProctorAssignment(Base):
     id = Column(Integer, primary_key=True, index=True)
     exam_id = Column(Integer, ForeignKey("exams.id", ondelete="CASCADE"), nullable=False)
     employee_id = Column(Integer, ForeignKey("employees.id", ondelete="CASCADE"), nullable=False)
+    room = Column(String, nullable=True, default="")  # which room within the exam
 
     exam = relationship("Exam", back_populates="assignments")
     employee = relationship("Employee", back_populates="assignments")
-
-    __table_args__ = (UniqueConstraint("exam_id", "employee_id", name="uq_exam_employee"),)
 
 
 class Room(Base):

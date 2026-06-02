@@ -79,6 +79,22 @@ export const api = {
   listExams: () => request('/exams'),
   createExam: (data) => request('/exams', { method: 'POST', body: JSON.stringify(data) }),
   deleteExam: (id) => request(`/exams/${id}`, { method: 'DELETE' }),
+  importExamsBS: async (file) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    const token = getToken()
+    const res = await fetch(BASE + '/exams/import-bs', {
+      method: 'POST',
+      body: fd,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}))
+      throw new Error(j.detail || 'Импорт қатесі')
+    }
+    return res.json()
+  },
+  exportExamsBSUrl: () => BASE + '/exams/export-bs',
 
   // proctors
   autoAssign: (clear) => request(`/proctors/auto-assign?clear=${clear ? 'true' : 'false'}`, { method: 'POST' }),

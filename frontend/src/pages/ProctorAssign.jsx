@@ -96,15 +96,16 @@ export default function ProctorAssign() {
                 </div>
               </div>
               <table>
-                <thead><tr><th>Қызметкер</th><th></th></tr></thead>
+                <thead><tr><th>Қызметкер</th><th>Кабинет</th><th></th></tr></thead>
                 <tbody>
                   {assignments.map((a) => (
                     <tr key={a.id}>
                       <td>{a.employee_name}</td>
+                      <td>{a.room ? <span className="badge">{a.room}</span> : <span style={{ color: '#9ca3af' }}>—</span>}</td>
                       <td><button className="danger" onClick={() => removeAssignment(a.id)}>Алып тастау</button></td>
                     </tr>
                   ))}
-                  {assignments.length === 0 && <tr><td colSpan="2" style={{ textAlign: 'center', color: '#9ca3af' }}>Прокторлар әлі жоқ</td></tr>}
+                  {assignments.length === 0 && <tr><td colSpan="3" style={{ textAlign: 'center', color: '#9ca3af' }}>Прокторлар әлі жоқ</td></tr>}
                 </tbody>
               </table>
             </>

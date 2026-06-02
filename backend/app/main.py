@@ -13,18 +13,40 @@ def _add_missing_columns():
     """Tiny migration helper — adds new columns to existing tables.
     Works for both SQLite and PostgreSQL. Idempotent."""
     inspector = inspect(engine)
-    if not inspector.has_table("employees"):
-        return
-    cols = {c["name"] for c in inspector.get_columns("employees")}
+    is_sqlite = engine.url.get_backend_name() == "sqlite"
+    bool_type = "INTEGER" if is_sqlite else "BOOLEAN"
+    bool_true = "1" if is_sqlite else "TRUE"
     stmts = []
-    if "department" not in cols:
-        stmts.append("ALTER TABLE employees ADD COLUMN department VARCHAR DEFAULT ''")
-    if "is_active" not in cols:
-        # SQLite needs literal default; PostgreSQL also accepts BOOLEAN DEFAULT TRUE
-        is_sqlite = engine.url.get_backend_name() == "sqlite"
-        default = "1" if is_sqlite else "TRUE"
-        col_type = "INTEGER" if is_sqlite else "BOOLEAN"
-        stmts.append(f"ALTER TABLE employees ADD COLUMN is_active {col_type} NOT NULL DEFAULT {default}")
+
+    if inspector.has_table("employees"):
+        cols = {c["name"] for c in inspector.get_columns("employees")}
+        if "department" not in cols:
+            stmts.append("ALTER TABLE employees ADD COLUMN department VARCHAR DEFAULT ''")
+        if "is_active" not in cols:
+            stmts.append(f"ALTER TABLE employees ADD COLUMN is_active {bool_type} NOT NULL DEFAULT {bool_true}")
+
+    if inspector.has_table("exams"):
+        cols = {c["name"] for c in inspector.get_columns("exams")}
+        new_text_cols = [
+            ("course_name", "VARCHAR DEFAULT ''"),
+            ("program_name", "VARCHAR DEFAULT ''"),
+            ("lecturer", "VARCHAR DEFAULT ''"),
+            ("course_year", "VARCHAR DEFAULT ''"),
+            ("exam_format", "VARCHAR DEFAULT ''"),
+        ]
+        for name, decl in new_text_cols:
+            if name not in cols:
+                stmts.append(f"ALTER TABLE exams ADD COLUMN {name} {decl}")
+        if "ects" not in cols:
+            stmts.append("ALTER TABLE exams ADD COLUMN ects INTEGER")
+        if "student_count" not in cols:
+            stmts.append("ALTER TABLE exams ADD COLUMN student_count INTEGER DEFAULT 0")
+
+    if inspector.has_table("proctor_assignments"):
+        cols = {c["name"] for c in inspector.get_columns("proctor_assignments")}
+        if "room" not in cols:
+            stmts.append("ALTER TABLE proctor_assignments ADD COLUMN room VARCHAR DEFAULT ''")
+
     if stmts:
         with engine.begin() as conn:
             for s in stmts:
