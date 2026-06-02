@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, getToken } from '../api.js'
+import Icon from '../components/Icon.jsx'
 
 export default function FxSchedule() {
   const [form, setForm] = useState({ start_date: '', end_date: '', time_slots: '09:00, 11:30, 14:30', default_duration: 90 })
@@ -61,7 +62,7 @@ export default function FxSchedule() {
               <label>Әдепкі ұзақтығы (мин)</label>
               <input type="number" min="15" value={form.default_duration} onChange={(e) => setForm({ ...form, default_duration: e.target.value })} />
             </div>
-            <div><button className="primary" type="submit">⚡ Генерациялау</button></div>
+            <div className="no-grow"><button className="primary" type="submit"><Icon name="spark" size={14} /> Генерациялау</button></div>
           </div>
         </form>
         {msg && <div className="success">{msg}</div>}
@@ -73,11 +74,11 @@ export default function FxSchedule() {
           <h3 style={{ margin: 0 }}>Дайын кесте ({list.length})</h3>
           {list.length > 0 && (
             <div className="row" style={{ flex: '0 0 auto', gap: 8 }}>
-              <button onClick={() => downloadWithAuth(api.exportScheduleBSUrl(), 'fx_schedule_bs.xlsx')} className="primary">
-                📤 BS форматта (2 парақ)
+              <button onClick={() => downloadWithAuth(api.exportScheduleBSUrl(), 'fx_schedule_bs.xlsx')} className="cta">
+                <Icon name="download" size={14} /> BS форматта (2 парақ)
               </button>
               <button onClick={() => downloadWithAuth(api.exportScheduleUrl(), 'fx_schedule.xlsx')}>
-                📥 Қарапайым Excel
+                <Icon name="download" size={14} /> Қарапайым Excel
               </button>
             </div>
           )}

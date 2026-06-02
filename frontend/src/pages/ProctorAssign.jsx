@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
+import Icon from '../components/Icon.jsx'
 
 export default function ProctorAssign() {
   const [exams, setExams] = useState([])
@@ -54,8 +55,12 @@ export default function ProctorAssign() {
       <h1 className="page-title">Проктор бөлу</h1>
       <div className="card">
         <div className="row">
-          <button className="primary" onClick={() => runAuto(false)}>🤖 Автоматты бөлу (қосу)</button>
-          <button onClick={() => runAuto(true)}>🔁 Тазалап қайта бөлу</button>
+          <button className="primary no-grow" onClick={() => runAuto(false)}>
+            <Icon name="spark" size={14} /> Автоматты бөлу
+          </button>
+          <button className="no-grow" onClick={() => runAuto(true)}>
+            <Icon name="refresh" size={14} /> Тазалап қайта бөлу
+          </button>
         </div>
         {msg && <div className="success">{msg}</div>}
         {err && <div className="error">{err}</div>}
@@ -68,7 +73,7 @@ export default function ProctorAssign() {
             <thead><tr><th>Пән</th><th>Күн/Уақыт</th><th>Қажет</th></tr></thead>
             <tbody>
               {exams.map((e) => (
-                <tr key={e.id} style={{ cursor: 'pointer', background: selected === e.id ? '#dbeafe' : '' }} onClick={() => loadAssignments(e.id)}>
+                <tr key={e.id} style={{ cursor: 'pointer', background: selected === e.id ? 'var(--primary-light)' : '' }} onClick={() => loadAssignments(e.id)}>
                   <td>{e.course_code}</td>
                   <td>{e.exam_date} {e.exam_time?.slice(0, 5)}</td>
                   <td>{e.required_proctors}</td>
@@ -102,7 +107,7 @@ export default function ProctorAssign() {
                     <tr key={a.id}>
                       <td>{a.employee_name}</td>
                       <td>{a.room ? <span className="badge">{a.room}</span> : <span style={{ color: '#9ca3af' }}>—</span>}</td>
-                      <td><button className="danger" onClick={() => removeAssignment(a.id)}>Алып тастау</button></td>
+                      <td><button className="danger" onClick={() => removeAssignment(a.id)} title="Алып тастау"><Icon name="trash" size={14} /></button></td>
                     </tr>
                   ))}
                   {assignments.length === 0 && <tr><td colSpan="3" style={{ textAlign: 'center', color: '#9ca3af' }}>Прокторлар әлі жоқ</td></tr>}

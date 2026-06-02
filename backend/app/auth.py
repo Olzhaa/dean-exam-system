@@ -15,6 +15,10 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-me-in-production")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_HOURS = 12
 
+if SECRET_KEY == "dev-secret-change-me-in-production":
+    import sys
+    print("[security] ⚠️  SECRET_KEY env var not set — using dev default. Set SECRET_KEY in production!", file=sys.stderr)
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", auto_error=False)
 
 
@@ -65,10 +69,13 @@ def require_admin(user: models.User = Depends(get_current_user)) -> models.User:
 
 
 def seed_admin(db: Session):
-    if not db.query(models.User).filter(models.User.username == "admin").first():
+    """Seed admin user. Password comes from ADMIN_PASSWORD env var, defaults to 'admin123'."""
+    admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
+    existing = db.query(models.User).filter(models.User.username == "admin").first()
+    if not existing:
         admin = models.User(
             username="admin",
-            password_hash=hash_password("admin123"),
+            password_hash=hash_password(admin_password),
             role="admin",
         )
         db.add(admin)

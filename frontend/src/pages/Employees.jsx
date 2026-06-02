@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api.js'
+import Icon from '../components/Icon.jsx'
 
 export default function Employees() {
   const [list, setList] = useState([])
@@ -59,9 +60,9 @@ export default function Employees() {
       <h1 className="page-title">Қызметкерлер</h1>
 
       <div className="card">
-        <h3 style={{ marginTop: 0 }}>Excel/CSV арқылы импорт</h3>
-        <p style={{ color: '#6b7280', fontSize: 13, marginTop: 0 }}>
-          Бағандар: <code>name</code> (міндетті), <code>department</code>, <code>min_proctor_count</code>, <code>max_proctor_count</code>
+        <h3><Icon name="upload" size={16} style={{ marginRight: 6 }} /> Excel/CSV импорт</h3>
+        <p className="muted" style={{ marginTop: 0 }}>
+          Бағандар: <code className="mono">name</code> (міндетті), <code className="mono">department</code>, <code className="mono">min_proctor_count</code>, <code className="mono">max_proctor_count</code>
         </p>
         <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" onChange={onImport} />
         {msg && <div className="success">{msg}</div>}
@@ -95,20 +96,16 @@ export default function Employees() {
         {err && <div className="error">{err}</div>}
       </div>
 
-      <div className="row" style={{ marginBottom: 12 }}>
-        <div style={{ flex: '0 0 auto' }}>
-          <button onClick={() => setFilter('all')} className={filter === 'all' ? 'primary' : ''}>Барлығы ({list.length})</button>
-        </div>
-        <div style={{ flex: '0 0 auto' }}>
-          <button onClick={() => setFilter('active')} className={filter === 'active' ? 'primary' : ''}>
-            Белсенді ({list.filter(e => e.is_active).length})
-          </button>
-        </div>
-        <div style={{ flex: '0 0 auto' }}>
-          <button onClick={() => setFilter('inactive')} className={filter === 'inactive' ? 'primary' : ''}>
-            Белсенді емес ({list.filter(e => !e.is_active).length})
-          </button>
-        </div>
+      <div className="tabs">
+        <button onClick={() => setFilter('all')} className={filter === 'all' ? 'active' : ''}>
+          Барлығы <span className="badge muted" style={{ marginLeft: 4 }}>{list.length}</span>
+        </button>
+        <button onClick={() => setFilter('active')} className={filter === 'active' ? 'active' : ''}>
+          Белсенді <span className="badge ok" style={{ marginLeft: 4 }}>{list.filter(e => e.is_active).length}</span>
+        </button>
+        <button onClick={() => setFilter('inactive')} className={filter === 'inactive' ? 'active' : ''}>
+          Белсенді емес <span className="badge warn" style={{ marginLeft: 4 }}>{list.filter(e => !e.is_active).length}</span>
+        </button>
       </div>
 
       <table>
@@ -133,10 +130,12 @@ export default function Employees() {
                 </span>
               </td>
               <td>
-                <button onClick={() => toggleActive(e.id)} style={{ marginRight: 6 }}>
-                  {e.is_active ? '⏸ Өшіру' : '▶ Қосу'}
+                <button onClick={() => toggleActive(e.id)} style={{ marginRight: 6 }} title={e.is_active ? 'Өшіру' : 'Қосу'}>
+                  <Icon name={e.is_active ? 'pause' : 'play'} size={14} />
                 </button>
-                <button className="danger" onClick={() => remove(e.id)}>Жою</button>
+                <button className="danger" onClick={() => remove(e.id)} title="Жою">
+                  <Icon name="trash" size={14} />
+                </button>
               </td>
             </tr>
           ))}

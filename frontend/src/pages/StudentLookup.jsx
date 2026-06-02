@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { api } from '../api.js'
+import Icon from '../components/Icon.jsx'
 
 export default function StudentLookup() {
   const [code, setCode] = useState('')
@@ -26,7 +27,7 @@ export default function StudentLookup() {
               <label>Студент коды</label>
               <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Мысалы: 220103045" required />
             </div>
-            <div><button className="primary" type="submit">🔍 Іздеу</button></div>
+            <div className="no-grow"><button className="primary" type="submit"><Icon name="search" size={14} /> Іздеу</button></div>
           </div>
         </form>
         {err && <div className="error">{err}</div>}

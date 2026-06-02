@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, NavLink, useNavigate } from 'react-router-dom'
 import { getToken, getRole, getUsername, setToken, setRole, setUsername } from './api.js'
+import Icon from './components/Icon.jsx'
 
 import Login from './pages/Login.jsx'
 import Dashboard from './pages/Dashboard.jsx'
@@ -11,28 +12,48 @@ import FxRequests from './pages/FxRequests.jsx'
 import FxSchedule from './pages/FxSchedule.jsx'
 import StudentLookup from './pages/StudentLookup.jsx'
 
+const NAV_ADMIN = [
+  { to: '/', icon: 'home', label: 'Басты бет', end: true },
+  { to: '/employees', icon: 'users', label: 'Қызметкерлер' },
+  { to: '/exams', icon: 'calendar', label: 'Емтихандар' },
+  { to: '/proctors', icon: 'clipboard', label: 'Проктор бөлу' },
+  { to: '/rooms', icon: 'building', label: 'Кабинеттер' },
+  { to: '/fx/requests', icon: 'doc', label: 'FX өтініштер' },
+  { to: '/fx/schedule', icon: 'table', label: 'FX кесте' },
+  { to: '/student', icon: 'search', label: 'Студент іздеу' },
+]
+
+const NAV_USER = [
+  { to: '/', icon: 'home', label: 'Басты бет', end: true },
+  { to: '/student', icon: 'search', label: 'Студент іздеу' },
+]
+
 function Sidebar({ role, username, onLogout }) {
-  const link = ({ isActive }) => (isActive ? 'active' : '')
+  const items = role === 'admin' ? NAV_ADMIN : NAV_USER
   return (
-    <aside className="sidebar">
-      <h2>📋 Деканат жүйесі</h2>
-      <nav>
-        <NavLink to="/" end className={link}>Басты бет</NavLink>
-        {role === 'admin' && (
-          <>
-            <NavLink to="/employees" className={link}>Қызметкерлер</NavLink>
-            <NavLink to="/exams" className={link}>Емтихандар</NavLink>
-            <NavLink to="/proctors" className={link}>Проктор бөлу</NavLink>
-            <NavLink to="/rooms" className={link}>Кабинеттер</NavLink>
-            <NavLink to="/fx/requests" className={link}>FX өтініштер</NavLink>
-            <NavLink to="/fx/schedule" className={link}>FX кесте</NavLink>
-          </>
-        )}
-        <NavLink to="/student" className={link}>Студент іздеу</NavLink>
+    <aside className="sidebar" style={{ display: 'flex', flexDirection: 'column' }}>
+      <div className="brand">
+        <Icon name="clipboard" size={28} strokeWidth={1.6} />
+        <div>
+          <div className="brand-title">Деканат</div>
+          <div className="brand-sub">Емтихан жүйесі</div>
+        </div>
+      </div>
+      <nav style={{ flex: 1 }}>
+        {items.map((item) => (
+          <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => (isActive ? 'active' : '')}>
+            <Icon name={item.icon} size={18} />
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
       </nav>
       <div className="user">
-        <div>{username} <span className="badge">{role}</span></div>
-        <button style={{ marginTop: 8, width: '100%' }} onClick={onLogout}>Шығу</button>
+        <div className="user-name">{username}</div>
+        <div className="user-role"><span className="badge">{role}</span></div>
+        <button onClick={onLogout} style={{ width: '100%', justifyContent: 'center' }}>
+          <Icon name="logout" size={16} />
+          <span>Шығу</span>
+        </button>
       </div>
     </aside>
   )
@@ -45,9 +66,7 @@ export default function App() {
   const username = getUsername()
 
   function logout() {
-    setToken(null)
-    setRole(null)
-    setUsername(null)
+    setToken(null); setRole(null); setUsername(null)
     nav('/login')
   }
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
+import Icon from '../components/Icon.jsx'
 
 export default function Rooms() {
   const [list, setList] = useState([])
@@ -50,7 +51,7 @@ export default function Rooms() {
             <tr key={r.id}>
               <td>{r.room_number}</td>
               <td>{r.capacity}</td>
-              <td><button className="danger" onClick={() => remove(r.id)}>Жою</button></td>
+              <td><button className="danger" onClick={() => remove(r.id)} title="Жою"><Icon name="trash" size={14} /></button></td>
             </tr>
           ))}
           {list.length === 0 && <tr><td colSpan="3" style={{ textAlign: 'center', color: '#9ca3af' }}>Кабинеттер жоқ</td></tr>}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api.js'
+import Icon from '../components/Icon.jsx'
 
 export default function FxRequests() {
   const [list, setList] = useState([])
@@ -55,7 +56,7 @@ export default function FxRequests() {
     <div>
       <h1 className="page-title">FX өтініштер</h1>
       <div className="card">
-        <h3 style={{ marginTop: 0 }}>📥 SDU FX тізімі (FX.xlsx)</h3>
+        <h3><Icon name="upload" size={16} style={{ marginRight: 6 }} /> SDU FX тізімі (FX.xlsx)</h3>
         <p style={{ color: '#6b7280', fontSize: 13, marginTop: 0 }}>
           Бағандар: <code>COURSE_CODE</code>, <code>COURSE_TITLE</code>, <code>INSTRUCTOR</code>, <code>SECTION</code>, <code>STUD_ID</code>, <code>STUD_FULL_NAME</code>, <code>FACULTY</code>, <code>CIPHER</code>, <code>SPECIALITY</code>, <code>ECTS</code>
         </p>
@@ -101,7 +102,7 @@ export default function FxRequests() {
               <td>{r.student_code}</td>
               <td>{r.student_name}</td>
               <td>{r.course_code}</td>
-              <td><button className="danger" onClick={() => remove(r.id)}>Жою</button></td>
+              <td><button className="danger" onClick={() => remove(r.id)} title="Жою"><Icon name="trash" size={14} /></button></td>
             </tr>
           ))}
           {list.length === 0 && <tr><td colSpan="4" style={{ textAlign: 'center', color: '#9ca3af' }}>Өтініштер жоқ</td></tr>}

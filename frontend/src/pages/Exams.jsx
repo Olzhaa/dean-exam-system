@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api, getToken } from '../api.js'
+import Icon from '../components/Icon.jsx'
 
 export default function Exams() {
   const [list, setList] = useState([])
@@ -68,16 +69,16 @@ export default function Exams() {
       <h1 className="page-title">Емтихандар (Final)</h1>
 
       <div className="card">
-        <h3 style={{ marginTop: 0 }}>📥 SDU BS Excel импорт</h3>
-        <p style={{ color: '#6b7280', fontSize: 13, marginTop: 0 }}>
+        <h3><Icon name="upload" size={16} style={{ marginRight: 6 }} /> SDU BS Excel импорт</h3>
+        <p className="muted" style={{ marginTop: 0 }}>
           Деканат файлын жүктеңіз (header 9-шы жолда). Жүйе курс, күн, уақыт, пән, кабинеттер, ұзақтығын автоматты оқиды.
         </p>
         <div className="row">
-          <div style={{ flex: 2 }}>
+          <div className="field" style={{ flex: 2 }}>
             <input ref={fileRef} type="file" accept=".xlsx,.xls" onChange={onImportBS} />
           </div>
-          <button className="primary" onClick={exportBS} disabled={list.length === 0}>
-            📤 Прокторлармен экспорт
+          <button className="cta no-grow" onClick={exportBS} disabled={list.length === 0}>
+            <Icon name="download" size={14} /> Прокторлармен экспорт
           </button>
         </div>
         {msg && <div className="success">{msg}</div>}
@@ -143,7 +144,7 @@ export default function Exams() {
               </td>
               <td>{e.student_count || '—'}</td>
               <td>{e.required_proctors}</td>
-              <td><button className="danger" onClick={() => remove(e.id)}>Жою</button></td>
+              <td><button className="danger" onClick={() => remove(e.id)} title="Жою"><Icon name="trash" size={14} /></button></td>
             </tr>
           ))}
           {list.length === 0 && <tr><td colSpan="8" style={{ textAlign: 'center', color: '#9ca3af' }}>Емтихан жоқ</td></tr>}
