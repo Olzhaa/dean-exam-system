@@ -49,14 +49,14 @@ def auto_assign(db: Session, clear_existing: bool = False) -> Tuple[int, List[in
     unassigned_exam_ids: List[int] = []
 
     for exam in exams:
-        rooms = exam.rooms_list
+        rooms_with_counts = exam.rooms_with_counts
         # If no rooms (online project), skip
-        if not rooms or exam.required_proctors <= 0:
+        if not rooms_with_counts:
             continue
 
         window = _exam_window(exam)
         # existing per-room counts
-        existing_per_room: Dict[str, int] = {r: 0 for r in rooms}
+        existing_per_room: Dict[str, int] = {r: 0 for r, _ in rooms_with_counts}
         already_assigned: Set[int] = set()
         for a in exam.assignments:
             already_assigned.add(a.employee_id)
@@ -64,8 +64,10 @@ def auto_assign(db: Session, clear_existing: bool = False) -> Tuple[int, List[in
                 existing_per_room[a.room] += 1
 
         exam_short = False
-        for room in rooms:
-            needed = max(0, exam.required_proctors - existing_per_room.get(room, 0))
+        for room, room_required in rooms_with_counts:
+            if room_required <= 0:
+                continue
+            needed = max(0, room_required - existing_per_room.get(room, 0))
             if needed == 0:
                 continue
 

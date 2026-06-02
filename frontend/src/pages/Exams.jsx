@@ -35,13 +35,21 @@ export default function Exams() {
 
   async function updateRequiredProctors(id, value) {
     const n = Math.max(0, parseInt(value, 10) || 0)
-    // optimistic update
     setList((cur) => cur.map((e) => (e.id === id ? { ...e, required_proctors: n } : e)))
     try {
       await api.updateExam(id, { required_proctors: n })
     } catch (ex) {
-      setErr(ex.message)
-      load()  // revert
+      setErr(ex.message); load()
+    }
+  }
+
+  async function updateRooms(id, value) {
+    setList((cur) => cur.map((e) => (e.id === id ? { ...e, room_number: value } : e)))
+    try {
+      const updated = await api.updateExam(id, { room_number: value })
+      setList((cur) => cur.map((e) => (e.id === id ? updated : e)))
+    } catch (ex) {
+      setErr(ex.message); load()
     }
   }
 
@@ -109,11 +117,11 @@ export default function Exams() {
               <input type="number" min="15" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} />
             </div>
             <div className="field" style={{ flex: 2 }}>
-              <label>Кабинет(тер)</label>
-              <input value={form.room_number} onChange={(e) => setForm({ ...form, room_number: e.target.value })} placeholder="G 112, G 113" required />
+              <label>Кабинет(тер) — ':N' арқылы әр кабинетке проктор санын беру</label>
+              <input value={form.room_number} onChange={(e) => setForm({ ...form, room_number: e.target.value })} placeholder="G 112:3, G 113:2, G 215" required />
             </div>
             <div className="field" style={{ flex: 1 }}>
-              <label>Кабинетке проктор</label>
+              <label>Әдепкі проктор саны</label>
               <input type="number" min="0" value={form.required_proctors} onChange={(e) => setForm({ ...form, required_proctors: e.target.value })} />
             </div>
             <div className="field" style={{ flex: 1 }}>
@@ -136,7 +144,7 @@ export default function Exams() {
         <thead>
           <tr>
             <th>Курс</th><th>Пән</th><th>Күн</th><th>Уақыт</th>
-            <th>Кабинеттер</th><th>Студ.</th><th>Кабинетке проктор</th><th></th>
+            <th>Кабинеттер (:N сан)</th><th>Студ.</th><th>Әдепкі</th><th></th>
           </tr>
         </thead>
         <tbody>
@@ -149,10 +157,15 @@ export default function Exams() {
               </td>
               <td>{e.exam_date}</td>
               <td>{e.exam_time?.slice(0, 5)} ({e.duration}м)</td>
-              <td style={{ fontSize: 12 }}>
-                {e.rooms_list && e.rooms_list.length > 0
-                  ? e.rooms_list.map(r => <span key={r} className="badge" style={{ marginRight: 4 }}>{r}</span>)
-                  : <span style={{ color: '#9ca3af' }}>—</span>}
+              <td style={{ minWidth: 220 }}>
+                <input
+                  defaultValue={e.room_number}
+                  onBlur={(ev) => { if (ev.target.value !== e.room_number) updateRooms(e.id, ev.target.value) }}
+                  onKeyDown={(ev) => { if (ev.key === 'Enter') ev.target.blur() }}
+                  placeholder="G 112:3, G 113:2"
+                  style={{ padding: '4px 8px', fontSize: 12, fontFamily: 'Fira Code, monospace' }}
+                  title="Мысалы: G 112:3, G 113:2, G 215 — ':N' әр кабинетке проктор санын береді"
+                />
               </td>
               <td>{e.student_count || '—'}</td>
               <td style={{ width: 90 }}>
@@ -163,7 +176,7 @@ export default function Exams() {
                   value={e.required_proctors}
                   onChange={(ev) => updateRequiredProctors(e.id, ev.target.value)}
                   style={{ width: 64, padding: '4px 8px', textAlign: 'center' }}
-                  title="Әр кабинетке проктор саны"
+                  title="Әдепкі проктор саны (:N жазылмаған кабинеттерге)"
                 />
               </td>
               <td><button className="danger" onClick={() => remove(e.id)} title="Жою"><Icon name="trash" size={14} /></button></td>

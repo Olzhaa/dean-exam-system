@@ -250,7 +250,7 @@ def export_bs_excel(db: Session) -> bytes:
             ex.program_name or "",
             ex.ects if ex.ects is not None else "",
             ex.student_count or "",
-            ex.room_number or "",
+            ", ".join(ex.rooms_list) if ex.rooms_list else (ex.room_number or ""),
             ex.exam_format or "",
             f"{ex.duration} мин" if ex.duration else "",
         ]

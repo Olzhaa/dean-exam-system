@@ -44,13 +44,33 @@ class Exam(Base):
     assignments = relationship("ProctorAssignment", back_populates="exam", cascade="all, delete-orphan")
 
     @property
-    def rooms_list(self) -> list[str]:
+    def rooms_with_counts(self) -> list[tuple[str, int]]:
+        """Parse `room_number` with optional ':N' per-room overrides.
+
+        Examples:
+          'G 112, G 113'         -> [('G 112', required_proctors), ('G 113', required_proctors)]
+          'G 112:3, G 113:2'     -> [('G 112', 3), ('G 113', 2)]
+          'G 112:3, G 113'       -> [('G 112', 3), ('G 113', required_proctors)]
+        """
         if not self.room_number:
             return []
-        # split by comma OR multiple spaces
         import re
         parts = re.split(r"[,;]\s*|\s{2,}|\n", self.room_number)
-        return [p.strip() for p in parts if p.strip()]
+        result: list[tuple[str, int]] = []
+        for p in parts:
+            p = p.strip()
+            if not p:
+                continue
+            m = re.match(r"^(.+?)\s*:\s*(\d+)\s*$", p)
+            if m:
+                result.append((m.group(1).strip(), int(m.group(2))))
+            else:
+                result.append((p, self.required_proctors))
+        return result
+
+    @property
+    def rooms_list(self) -> list[str]:
+        return [name for name, _ in self.rooms_with_counts]
 
 
 class ProctorAssignment(Base):
