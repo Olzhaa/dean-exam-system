@@ -31,7 +31,7 @@ def auto_assign(db: Session, clear_existing: bool = False) -> Tuple[int, List[in
         db.commit()
 
     exams: List[models.Exam] = db.query(models.Exam).order_by(models.Exam.exam_date, models.Exam.exam_time).all()
-    employees: List[models.Employee] = db.query(models.Employee).all()
+    employees: List[models.Employee] = db.query(models.Employee).filter(models.Employee.is_active == True).all()
 
     # Pre-compute existing assignments per employee (their busy windows)
     busy: Dict[int, List[Tuple[datetime, datetime]]] = {e.id: [] for e in employees}
@@ -87,6 +87,8 @@ def can_assign_manually(db: Session, exam_id: int, employee_id: int) -> Tuple[bo
     emp = db.query(models.Employee).get(employee_id)
     if not exam or not emp:
         return False, "Емтихан немесе қызметкер табылмады"
+    if not emp.is_active:
+        return False, "Қызметкер белсенді емес (inactive)"
     if emp.current_proctor_count >= emp.max_proctor_count:
         return False, f"Қызметкер max лимитіне жетті ({emp.max_proctor_count})"
     if any(a.employee_id == employee_id for a in exam.assignments):

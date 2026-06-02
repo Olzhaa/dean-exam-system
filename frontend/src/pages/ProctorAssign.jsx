@@ -86,9 +86,9 @@ export default function ProctorAssign() {
                 <div className="row">
                   <select value={pickEmp} onChange={(e) => setPickEmp(e.target.value)} style={{ flex: 2 }}>
                     <option value="">— Қызметкерді таңдаңыз —</option>
-                    {employees.map((emp) => (
+                    {employees.filter((emp) => emp.is_active).map((emp) => (
                       <option key={emp.id} value={emp.id} disabled={emp.current_proctor_count >= emp.max_proctor_count}>
-                        {emp.name} ({emp.current_proctor_count}/{emp.max_proctor_count})
+                        {emp.name}{emp.department ? ` · ${emp.department}` : ''} ({emp.current_proctor_count}/{emp.max_proctor_count})
                       </option>
                     ))}
                   </select>

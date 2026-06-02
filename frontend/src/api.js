@@ -57,7 +57,23 @@ export const api = {
   listEmployees: () => request('/employees'),
   createEmployee: (data) => request('/employees', { method: 'POST', body: JSON.stringify(data) }),
   updateEmployee: (id, data) => request(`/employees/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  toggleEmployeeActive: (id) => request(`/employees/${id}/toggle-active`, { method: 'POST' }),
   deleteEmployee: (id) => request(`/employees/${id}`, { method: 'DELETE' }),
+  importEmployees: async (file) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    const token = getToken()
+    const res = await fetch(BASE + '/employees/import', {
+      method: 'POST',
+      body: fd,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}))
+      throw new Error(j.detail || 'Импорт қатесі')
+    }
+    return res.json()
+  },
 
   // exams
   listExams: () => request('/exams'),

@@ -19,6 +19,8 @@ class TokenResponse(BaseModel):
 # ===== Employees =====
 class EmployeeBase(BaseModel):
     name: str
+    department: Optional[str] = ""
+    is_active: bool = True
     min_proctor_count: int = 0
     max_proctor_count: int = 10
 
@@ -29,6 +31,8 @@ class EmployeeCreate(EmployeeBase):
 
 class EmployeeUpdate(BaseModel):
     name: Optional[str] = None
+    department: Optional[str] = None
+    is_active: Optional[bool] = None
     min_proctor_count: Optional[int] = None
     max_proctor_count: Optional[int] = None
 
@@ -37,6 +41,12 @@ class EmployeeOut(EmployeeBase):
     id: int
     current_proctor_count: int
     model_config = ConfigDict(from_attributes=True)
+
+
+class EmployeeImportResult(BaseModel):
+    added: int
+    skipped: int
+    errors: List[str] = []
 
 
 # ===== Exams =====

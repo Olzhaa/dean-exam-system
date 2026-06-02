@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, UniqueConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, UniqueConstraint, Boolean
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -15,6 +15,8 @@ class Employee(Base):
     __tablename__ = "employees"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
+    department = Column(String, nullable=True, default="")
+    is_active = Column(Boolean, nullable=False, default=True)
     min_proctor_count = Column(Integer, nullable=False, default=0)
     max_proctor_count = Column(Integer, nullable=False, default=10)
     current_proctor_count = Column(Integer, nullable=False, default=0)
