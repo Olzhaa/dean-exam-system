@@ -1,0 +1,12 @@
+backend/venv/
+.claude/
+ruvector.db
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.db
+backend/*.db-journal
+frontend/node_modules/
+frontend/dist/
+.env
+.DS_Store
+*.pyc
